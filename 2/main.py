@@ -1,52 +1,62 @@
+import argparse
 import re
-from pathlib import Path
+from typing import List
 
 
-def read_input():
-    parent_dir = Path(__file__).resolve().parent
-    with open(parent_dir / "input2.txt", "r") as file:
-        return file.readlines()
+def read_input(filename: str) -> List[str]:
+    try:
+        with open(filename, "r") as file:
+            return file.readlines()
+    except FileNotFoundError:
+        print(f"Error: the file {filename} was not found")
+        exit(1)
+    except IOError as e:
+        print(f"Error: An I/O error occurred while reading the file: {e}")
+        exit(1)
 
 
-def same_direction(input):
-    asc = input[0] < input[1]
-    for i in range(len(input) - 1):
-        if asc and input[i] > input[i + 1]:
-            return False
-        elif not asc and input[i] < input[i + 1]:
-            return False
-    return True
-
-
-def is_safe_report(report):
-    if not same_direction(report):
+def is_monotonic(sequence: List[int]) -> bool:
+    if len(sequence) < 2:
+        return True
+    if sequence[0] == sequence[1]:
         return False
-    for i in range(len(report) - 1):
-        diff = abs(int(report[i]) - int(report[i + 1])) 
-        if diff < 1 or diff > 3:
-            return False
-    return True
+    is_ascending = sequence[0] < sequence[1]
+    return all(
+        (
+            sequence[i] < sequence[i + 1]
+            if is_ascending
+            else sequence[i] > sequence[i + 1]
+        )
+        for i in range(len(sequence) - 1)
+    )
 
 
-def part_one(input):
-    pattern = r"(\d+)"
+def is_safe_report(report: List[int]) -> bool:
+    if not is_monotonic(report):
+        return False
+    return all(1 <= abs(a - b) <= 3 for a, b in zip(report, report[1:]))
+
+
+def part_one(input: List[str]) -> int:
     num_safe_reports = 0
+    pattern = r"(\d+)"
     for line in input:
         match = re.findall(pattern, line)
-        print(match)
         if match is None:
-            print("No match found")
+            print(f"No match found in line {line.strip()}")
             continue
-        result = is_safe_report(match)
-        print(result)
-        if result:
+        report = [int(x) for x in match]
+        if is_safe_report(report):
             num_safe_reports += 1
     return num_safe_reports
-                
 
 
 def main():
-    input = read_input()
+    parser = argparse.ArgumentParser()
+    parser.add_argument("filename", help="Path to input file")
+    args = parser.parse_args()
+
+    input = read_input(args.filename)
     part_one_result = part_one(input)
     print(f"Part One: {part_one_result}")
 

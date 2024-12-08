@@ -23,20 +23,6 @@ def part_one(left, right):
 
 
 def part_two(left, right):
-    # right_dict = {}
-    # for i in range(5):
-    #     if right_dict.get(right[i]) is None:
-    #         right_dict[right[i]] = 1
-    #     else:
-    #         right_dict[right[i]] += 1
-    # similarity_score = 0
-    # for i in range(5):
-    #     num_right_occur = right_dict.get(left[i])
-    #     if num_right_occur is None:
-    #         continue
-    #     else:
-    #         similarity_score += int(left[i]) * int(num_right_occur)
-    # return similarity_score
     right_counter = Counter(right)
     similarity_score = sum(
         int(l) * right_counter[l] for l in left if l in right_counter
