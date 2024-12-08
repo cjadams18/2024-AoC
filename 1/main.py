@@ -1,19 +1,30 @@
+import argparse
 import re
 from collections import Counter
-from pathlib import Path
+from typing import List, Tuple
 
 
-def read_input():
-    parent_dir = Path(__file__).resolve().parent
-    with open(parent_dir / "input.txt", "r") as file:
-        line_split_regex = r"(\d{5})\s+(\d{5})"
-        left, right = [], []
-        for line in file:
-            match = re.search(line_split_regex, line)
-            if match:
-                left.append(match[1])
-                right.append(match[2])
-        return left, right
+def read_file_lines(filename: str) -> List[str]:
+    try:
+        with open(filename, "r") as file:
+            return file.readlines()
+    except FileNotFoundError:
+        print(f"Error: the file {filename} was not found")
+        exit(1)
+    except IOError as e:
+        print(f"Error: An I/O error occurred while reading the file: {e}")
+        exit(1)
+
+
+def parse_file_lines(input: List[str]) -> Tuple[List[str], List[str]]:
+    line_split_regex = r"(\d{5})\s+(\d{5})"
+    left, right = [], []
+    for line in input:
+        match = re.search(line_split_regex, line)
+        if match:
+            left.append(match[1])
+            right.append(match[2])
+    return left, right
 
 
 def part_one(left, right):
@@ -31,7 +42,13 @@ def part_two(left, right):
 
 
 def main():
-    left, right = read_input()
+    parser = argparse.ArgumentParser()
+    parser.add_argument("filename", help="Path to input file")
+    args = parser.parse_args()
+
+    input = read_file_lines(args.filename)
+    left, right = parse_file_lines(input)
+
     part_one_result = part_one(left, right)
     part_two_result = part_two(left, right)
     print(f"Part One: {part_one_result}\nPart Two: {part_two_result}")

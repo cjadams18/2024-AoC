@@ -3,7 +3,7 @@ import re
 from typing import List
 
 
-def read_input(filename: str) -> List[str]:
+def read_file_lines(filename: str) -> List[str]:
     try:
         with open(filename, "r") as file:
             return file.readlines()
@@ -56,7 +56,7 @@ def main():
     parser.add_argument("filename", help="Path to input file")
     args = parser.parse_args()
 
-    input = read_input(args.filename)
+    input = read_file_lines(args.filename)
     part_one_result = part_one(input)
     print(f"Part One: {part_one_result}")
 
