@@ -31,14 +31,26 @@ def is_monotonic(sequence: List[int]) -> bool:
     )
 
 
-def is_safe_report(report: List[int]) -> bool:
+def is_safe_report_p1(report: List[int]) -> bool:
     if not is_monotonic(report):
         return False
     return all(1 <= abs(a - b) <= 3 for a, b in zip(report, report[1:]))
 
 
-def part_one(input: List[str]) -> int:
-    num_safe_reports = 0
+def is_safe_report_p2(report: List[int]) -> bool:
+    if is_safe_report_p1(report):
+        return True
+    report_as_dict = dict(enumerate(report))
+    for i in range(len(report)):
+        temp = [value for key, value in report_as_dict.items() if key != i]
+        if is_safe_report_p1(temp):
+            return True
+    return False
+
+
+def check_reports(input: List[str]) -> int:
+    num_safe_reports_p1 = 0
+    num_safe_reports_p2 = 0
     pattern = r"(\d+)"
     for line in input:
         match = re.findall(pattern, line)
@@ -46,9 +58,11 @@ def part_one(input: List[str]) -> int:
             print(f"No match found in line {line.strip()}")
             continue
         report = [int(x) for x in match]
-        if is_safe_report(report):
-            num_safe_reports += 1
-    return num_safe_reports
+        if is_safe_report_p1(report):
+            num_safe_reports_p1 += 1
+        if is_safe_report_p2(report):
+            num_safe_reports_p2 += 1
+    return num_safe_reports_p1, num_safe_reports_p2
 
 
 def main():
@@ -57,8 +71,8 @@ def main():
     args = parser.parse_args()
 
     input = read_file_lines(args.filename)
-    part_one_result = part_one(input)
-    print(f"Part One: {part_one_result}")
+    part_one_result, part_two_result = check_reports(input)
+    print(f"Part One: {part_one_result}\nPart Two: {part_two_result}")
 
 
 if __name__ == "__main__":
